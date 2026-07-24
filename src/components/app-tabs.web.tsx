@@ -1,3 +1,4 @@
+import type { Href } from 'expo-router';
 import {
   Tabs,
   TabList,
@@ -21,7 +22,15 @@ export default function AppTabs() {
       <TabSlot style={{ height: '100%' }} />
       <TabList asChild>
         <CustomTabList>
-          <TabTrigger name="home" href="/" asChild>
+          {/*
+            expo-router/ui resolves TabTrigger href relative to this Tabs'
+            own directory ((tabs)/), so "/" correctly means "this group's
+            index" — but typed-routes' generated Href union models it as
+            the absolute app-wide path instead, so it doesn't include the
+            bare "/" literal here. Cast narrowly rather than widening the
+            prop's real type.
+          */}
+          <TabTrigger name="home" href={'/' as Href} asChild>
             <TabButton>Home</TabButton>
           </TabTrigger>
           <TabTrigger name="explore" href="/explore" asChild>

@@ -1,56 +1,79 @@
-# Welcome to your Expo app 👋
+# my-app
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+An [Expo](https://expo.dev) app using file-based routing ([Expo Router](https://docs.expo.dev/router/introduction)) and a layered, dependency-injected architecture.
+
+## Requirements
+
+- Node.js **20.19.4+** (React Native 0.86 / Metro requires it — `18.x` will fail to bundle)
 
 ## Get started
 
-1. Install dependencies
-
-   ```bash
-   npm install
-   ```
-
-2. Start the app
-
-   ```bash
-   npx expo start
-   ```
-
-In the output, you'll find options to open the app in a
-
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
-
 ```bash
-npm run reset-project
+npm install
+npx expo start
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+In the output you'll find options to open the app in a development build, Android emulator, iOS simulator, or the web.
 
-### Other setup steps
+> **Note:** this project uses `react-native-mmkv` (v4, Nitro modules) for local storage. It requires a custom dev client — it will **not** run inside Expo Go. Use `npx expo prebuild` and run on a simulator/device, or `npx expo start --web` for the web target.
 
-- To set up ESLint for linting, run `npx expo lint`, or follow our guide on ["Using ESLint and Prettier"](https://docs.expo.dev/guides/using-eslint/)
-- If you'd like to set up unit testing, follow our guide on ["Unit Testing with Jest"](https://docs.expo.dev/develop/unit-testing/)
-- Learn more about the TypeScript setup in this template in our guide on ["Using TypeScript"](https://docs.expo.dev/guides/typescript/)
+## Architecture
+
+Code lives under `src/`, organized by layer and feature:
+
+```
+src/
+  app/            expo-router routes (kept thin — screen composition only)
+  core/           cross-cutting building blocks, no feature knowledge
+    api/          BaseApiClient (axios) + ApiError
+    di/           tsyringe tokens + the composition root (register-dependencies.ts)
+    domain/       BaseRepository, BaseUseCase
+    query/        TanStack Query client/provider
+    storage/      MMKV-backed StorageService
+  features/       one folder per feature, layered internally:
+    <feature>/
+      data/         repositories + API services (implement domain interfaces)
+      domain/       types, interfaces, use-cases
+      application/  hooks that compose use-cases + TanStack Query + Zustand
+      presentation/ screens/components
+  shared/         hooks/components with no feature ownership (e.g. useDependency)
+```
+
+### Dependency injection
+
+Uses [tsyringe](https://github.com/microsoft/tsyringe) with `@injectable()`/`@inject()` decorators. Concrete classes with no swappable interface (e.g. `AuthApiService`, `LoginUseCase`) are injected by class reference; anything crossing an interface boundary (e.g. `IAuthRepository`, `IStorageService`) is injected via a `Symbol` token from `src/core/di/tokens.ts`.
+
+All bindings are registered once in `src/core/di/register-dependencies.ts` — the **composition root**, the one file allowed to import concrete implementations from every feature. It's called from the root layout before the app renders. Resolve dependencies inside components/hooks with `useDependency` (`src/shared/hooks/use-dependency.ts`).
+
+### Base classes
+
+- `BaseApiClient` — one axios instance per subclass, with error normalization into `ApiError`.
+- `BaseRepository<TEntity, TId>` — CRUD contract for resource-style features (not every repository needs this — e.g. auth isn't a CRUD resource, so it implements its own narrow interface instead).
+- `BaseUseCase<TInput, TOutput>` — one class per business operation, keeping orchestration out of repositories and hooks.
+
+### Libraries
+
+| Concern | Library |
+|---|---|
+| DI | tsyringe + reflect-metadata |
+| HTTP | axios |
+| Server/async state | TanStack Query |
+| Client/UI state | Zustand |
+| Forms + validation | React Hook Form + Zod |
+| Local storage | react-native-mmkv |
+
+### Reference implementation
+
+`src/features/auth/` is a full vertical slice demonstrating the pattern end-to-end: `AuthApiService` → `AuthRepository` (implements `IAuthRepository`) → `LoginUseCase` → `useLogin` hook → `LoginScreen`, wired up at the `/login` route.
+
+## Other setup steps
+
+- ESLint is configured (`eslint.config.js`) — run `npx expo lint`.
+- If you'd like to set up unit testing, follow the guide on ["Unit Testing with Jest"](https://docs.expo.dev/develop/unit-testing/).
+- `babel.config.js` and `tsconfig.json` enable legacy decorators + decorator metadata for tsyringe. `metro.config.js` forces `tsyringe` to resolve its CJS build — its ESM build has a `tslib` interop bug under Metro's web bundling.
 
 ## Learn more
 
-To learn more about developing your project with Expo, look at the following resources:
-
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+- [Expo documentation](https://docs.expo.dev/)
+- [Expo Router](https://docs.expo.dev/router/introduction)
+- [tsyringe](https://github.com/microsoft/tsyringe)

@@ -16,6 +16,9 @@ export default function HomeScreen() {
       <Link href="/about" style={styles.link}>
         Go to About →
       </Link>
+      <Link href="/posts" style={styles.link}>
+        Go to Posts (API CRUD demo) →
+      </Link>
       <CounterCard />
       <ProfileForm />
     </ScrollView>

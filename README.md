@@ -1,0 +1,61 @@
+# my-app
+
+Expo (SDK 57) React Native boilerplate, set up as a starting point for new feature work.
+
+## Stack
+
+- **Navigation:** [Expo Router](https://docs.expo.dev/versions/v57.0.0/) (file-based, in `app/`)
+- **Client state:** [Zustand](https://github.com/pmndrs/zustand)
+- **Server / async state:** [TanStack Query](https://tanstack.com/query)
+- **Forms & validation:** [React Hook Form](https://react-hook-form.com/) + [Zod](https://zod.dev/) via `@hookform/resolvers`
+- **Persistence:** `@react-native-async-storage/async-storage`
+
+## Structure
+
+```
+app/                      Expo Router routes only (screens, layouts)
+  _layout.tsx             Root layout — wraps the app in AppProviders + Stack navigator
+  index.tsx               Home screen
+  +not-found.tsx          404 fallback route
+
+src/
+  providers/              App-wide provider composition (React Query, SafeAreaProvider, ...)
+  lib/                    Cross-cutting utilities (query client, storage helpers)
+  shared/
+    ui/                   Reusable, presentation-only components (Button, TextField, ...)
+    theme/                Design tokens (colors, spacing, ...)
+  features/
+    <feature>/            One folder per feature slice
+      api.ts              Data access for the feature
+      schema.ts           Zod schemas / types
+      hooks/               React Query hooks wrapping the API
+      components/         Feature-specific UI
+```
+
+`app/` stays thin — screens compose components from `src/features/*` and `src/shared/*`. Each feature is self-contained; to add a new one, copy the shape of `src/features/profile` (React Hook Form + Zod + React Query) or `src/features/counter` (Zustand) rather than reaching into another feature's internals.
+
+## Native project (`android/`, `ios/`)
+
+Native folders are **not committed** — they're generated locally via [Continuous Native Generation](https://docs.expo.dev/versions/v57.0.0/) and regenerated whenever native config changes:
+
+```bash
+npx expo prebuild --clean
+```
+
+### Windows: NDK linker fix
+
+A bug in the Android NDK's CMake toolchain (`android-legacy.toolchain.cmake`) adds a linker flag that breaks native builds on Windows. This is patched automatically in the local Android SDK install (not the repo) — safe to re-run, no-op once patched:
+
+```bash
+npm run fix:ndk-windows
+```
+
+`scripts/install-android.bat` runs this fix and then builds/installs to a connected device or emulator in one step.
+
+## Getting started
+
+```bash
+npm install
+npx expo prebuild --clean
+npm run android      # or: npm run ios / npm run web
+```

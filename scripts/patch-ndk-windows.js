@@ -47,17 +47,22 @@ function patchToolchainFile(file) {
 
 const sdkRoot = findSdkRoot();
 if (!sdkRoot) {
-  console.warn('[patch-ndk-windows] Could not find the Android SDK (checked ANDROID_HOME, ANDROID_SDK_ROOT, %LOCALAPPDATA%\\Android\\Sdk). Skipping.');
+  console.warn(
+    '[patch-ndk-windows] Could not find the Android SDK (checked ANDROID_HOME, ANDROID_SDK_ROOT, %LOCALAPPDATA%\\Android\\Sdk). Skipping.',
+  );
   process.exit(0);
 }
 
 const ndkRoot = path.join(sdkRoot, 'ndk');
 if (!fs.existsSync(ndkRoot)) {
-  console.warn(`[patch-ndk-windows] No NDK installed yet under ${ndkRoot}. Run the Android build once to let it download, then re-run: node scripts/patch-ndk-windows.js`);
+  console.warn(
+    `[patch-ndk-windows] No NDK installed yet under ${ndkRoot}. Run the Android build once to let it download, then re-run: node scripts/patch-ndk-windows.js`,
+  );
   process.exit(0);
 }
 
-const versions = fs.readdirSync(ndkRoot, { withFileTypes: true })
+const versions = fs
+  .readdirSync(ndkRoot, { withFileTypes: true })
   .filter((entry) => entry.isDirectory())
   .map((entry) => entry.name);
 

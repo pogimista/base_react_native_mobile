@@ -1,3 +1,4 @@
+import { Link } from 'expo-router';
 import { ScrollView, StyleSheet, Text } from 'react-native';
 
 import { CounterCard } from '../src/features/counter/CounterCard';
@@ -12,6 +13,9 @@ export default function HomeScreen() {
       keyboardShouldPersistTaps="handled"
     >
       <Text style={styles.heading}>my-app</Text>
+      <Link href="/about" style={styles.link}>
+        Go to About →
+      </Link>
       <CounterCard />
       <ProfileForm />
     </ScrollView>
@@ -31,5 +35,10 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: '700',
     color: colors.text,
+  },
+  link: {
+    fontSize: 16,
+    color: colors.primary,
+    fontWeight: '600',
   },
 });

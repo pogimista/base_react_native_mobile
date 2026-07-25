@@ -9,6 +9,8 @@ Expo (SDK 57) React Native boilerplate, set up as a starting point for new featu
 - **Server / async state:** [TanStack Query](https://tanstack.com/query)
 - **Forms & validation:** [React Hook Form](https://react-hook-form.com/) + [Zod](https://zod.dev/) via `@hookform/resolvers`
 - **Persistence:** `@react-native-async-storage/async-storage`
+- **Lint / format:** ESLint (`eslint-config-expo`) + Prettier
+- **Tests:** Jest (`jest-expo` preset)
 
 ## Structure
 
@@ -33,6 +35,19 @@ src/
 ```
 
 `app/` stays thin — screens compose components from `src/features/*` and `src/shared/*`. Each feature is self-contained; to add a new one, copy the shape of `src/features/profile` (React Hook Form + Zod + React Query) or `src/features/counter` (Zustand) rather than reaching into another feature's internals.
+
+Unhandled render errors are caught by `src/shared/components/ErrorBoundary.tsx` (wrapping the whole app in `app/_layout.tsx`) instead of showing a blank screen.
+
+## Scripts
+
+```bash
+npm run lint           # ESLint
+npm run format         # Prettier — write
+npm run format:check   # Prettier — check only, no writes (use in CI)
+npm test               # Jest
+```
+
+Each feature slice should carry its own tests next to the code it covers — see `src/features/profile/schema.test.ts` and `src/features/counter/store.test.ts` for the pattern (schema validation and store logic; no rendering required for either).
 
 ## Native project (`android/`, `ios/`)
 

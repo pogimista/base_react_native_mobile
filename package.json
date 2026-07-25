@@ -16,6 +16,7 @@
     "start": "expo start",
     "android": "expo run:android",
     "android:install": "expo run:android",
+    "fix:ndk-windows": "node scripts/patch-ndk-windows.js",
     "ios": "expo run:ios",
     "web": "expo start --web"
   },

@@ -69,9 +69,7 @@ export function PokemonScreen() {
       onEndReached={loadMore}
       renderItem={renderItem}
       getItemLayout={getItemLayout}
-      ListFooterComponent={
-        isFetchingNextPage ? <ActivityIndicator style={styles.footer} /> : null
-      }
+      ListFooterComponent={isFetchingNextPage ? <ActivityIndicator style={styles.footer} /> : null}
     />
   );
 }

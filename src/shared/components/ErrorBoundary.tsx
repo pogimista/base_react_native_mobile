@@ -3,6 +3,7 @@ import { StyleSheet, Text, View } from 'react-native';
 
 import { Button } from '../ui/Button';
 import { colors } from '../theme/colors';
+import { captureException } from '../../lib/sentry';
 
 type Props = {
   children: ReactNode;
@@ -21,6 +22,7 @@ export class ErrorBoundary extends Component<Props, State> {
 
   componentDidCatch(error: Error) {
     console.error('Unhandled error caught by ErrorBoundary:', error);
+    captureException(error);
   }
 
   reset = () => this.setState({ error: null });

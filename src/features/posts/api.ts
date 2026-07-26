@@ -12,7 +12,6 @@ export function createPost(input: CreatePostInput) {
 }
 
 export function renamePost(id: number, title: string) {
-
   return apiClient.patch<Post>(`/posts/${id}`, { title });
 }
 

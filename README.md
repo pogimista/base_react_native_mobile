@@ -57,6 +57,30 @@ Native folders are **not committed** — they're generated locally via [Continuo
 npx expo prebuild --clean
 ```
 
+### Crash reporting
+
+Sentry (`@sentry/react-native`) is wired up but disabled until a DSN is provided — see `src/lib/sentry.ts`. To turn it on:
+
+1. Create a project at [sentry.io](https://sentry.io) (or run `npx @sentry/wizard@latest -i reactNative` for the fully automated setup, including EAS source map uploads).
+2. Set `EXPO_PUBLIC_SENTRY_DSN` in `.env` to the project's DSN.
+3. For EAS builds, also set `SENTRY_AUTH_TOKEN` (sensitive) in the build environment so source maps upload correctly.
+
+Without a DSN, `initSentry()` and `captureException()` are no-ops (errors still log to the console via the `ErrorBoundary`).
+
+### CI
+
+`.github/workflows/ci.yml` runs format check, lint, typecheck, and tests on every push/PR to `main`.
+
+### EAS build
+
+`eas.json` defines `development` / `preview` / `production` build profiles. To actually build:
+
+1. Run `eas init` once (requires an Expo account) to link the project and add `expo.extra.eas.projectId` to `app.json`.
+2. Run builds locally with `eas build --profile preview --platform android`, or trigger `.github/workflows/eas-build.yml` manually from the Actions tab.
+3. For the GitHub Actions build to authenticate, add an `EXPO_TOKEN` repo secret (an [Expo access token](https://expo.dev/accounts/%5Baccount%5D/settings/access-tokens)).
+
+Neither of these is set up yet — the workflow and `eas.json` are scaffolded and ready as soon as the project is linked to an Expo account.
+
 ### Windows: NDK linker fix
 
 A bug in the Android NDK's CMake toolchain (`android-legacy.toolchain.cmake`) adds a linker flag that breaks native builds on Windows. This is patched automatically in the local Android SDK install (not the repo) — safe to re-run, no-op once patched:

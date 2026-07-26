@@ -17,9 +17,11 @@ export class ApiError extends Error {
 
 function logRequest(config: InternalAxiosRequestConfig) {
   config.startTime = Date.now();
-  console.log(`[api] --> ${config.method?.toUpperCase()} ${config.url}`);
-  if (config.data !== undefined) {
-    console.log(`[api]     body: ${JSON.stringify(config.data)}`);
+  if (__DEV__) {
+    console.log(`[api] --> ${config.method?.toUpperCase()} ${config.url}`);
+    if (config.data !== undefined) {
+      console.log(`[api]     body: ${JSON.stringify(config.data)}`);
+    }
   }
   return config;
 }
@@ -29,6 +31,9 @@ function logResponse(
   status: number,
   data: unknown,
 ) {
+  if (!__DEV__) {
+    return;
+  }
   const duration = config?.startTime ? Date.now() - config.startTime : 0;
   const method = config?.method?.toUpperCase() ?? '?';
   const url = config?.url ?? '?';
@@ -74,4 +79,6 @@ export function createApiClient(baseUrl: string) {
   };
 }
 
-export const apiClient = createApiClient('https://jsonplaceholder.typicode.com');
+const BASE_URL = process.env.EXPO_PUBLIC_API_BASE_URL ?? 'https://jsonplaceholder.typicode.com';
+
+export const apiClient = createApiClient(BASE_URL);

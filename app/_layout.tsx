@@ -1,10 +1,14 @@
+import * as Sentry from '@sentry/react-native';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 
 import { ErrorBoundary } from '../src/shared/components/ErrorBoundary';
 import { AppProviders } from '../src/providers/AppProviders';
+import { initSentry } from '../src/lib/sentry';
 
-export default function RootLayout() {
+initSentry();
+
+function RootLayout() {
   return (
     <ErrorBoundary>
       <AppProviders>
@@ -14,3 +18,5 @@ export default function RootLayout() {
     </ErrorBoundary>
   );
 }
+
+export default Sentry.wrap(RootLayout);

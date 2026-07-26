@@ -19,6 +19,9 @@ export default function HomeScreen() {
       <Link href="/posts" style={styles.link}>
         Go to Posts (API CRUD demo) →
       </Link>
+      <Link href="/pokemon" style={styles.link}>
+        Go to Pokemon (API GET demo) →
+      </Link>
       <CounterCard />
       <ProfileForm />
     </ScrollView>

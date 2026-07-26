@@ -81,6 +81,30 @@ Without a DSN, `initSentry()` and `captureException()` are no-ops (errors still 
 
 Neither of these is set up yet — the workflow and `eas.json` are scaffolded and ready as soon as the project is linked to an Expo account.
 
+### EAS Update
+
+`eas update:configure` has already set `updates.url` and `runtimeVersion` in `app.json`, and channels (`development` / `preview` / `production`) in `eas.json`. To publish an update to a channel:
+
+```bash
+eas update --branch preview --message "describe the change"
+```
+
+Builds pick up updates automatically based on the channel they were built with — no rebuild needed for JS-only changes.
+
+### EAS Submit
+
+`eas.json` has a `submit.production` scaffold with placeholder values — replace before submitting:
+
+- **Android**: `android.serviceAccountKeyPath` points to `./google-service-account.json` (gitignored — get this from Google Play Console → Setup → API access → create a service account key).
+- **iOS**: fill in `appleId`, `ascAppId` (App Store Connect app ID), and `appleTeamId` in `eas.json`, or delete those fields and let `eas submit` prompt for them interactively.
+
+Then submit with:
+
+```bash
+eas submit --platform android --profile production
+eas submit --platform ios --profile production
+```
+
 ### Windows: NDK linker fix
 
 A bug in the Android NDK's CMake toolchain (`android-legacy.toolchain.cmake`) adds a linker flag that breaks native builds on Windows. This is patched automatically in the local Android SDK install (not the repo) — safe to re-run, no-op once patched:

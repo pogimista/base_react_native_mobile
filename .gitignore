@@ -43,3 +43,6 @@ yarn-error.*
 # IDE / assistant config
 .idea/
 .claude/
+
+# EAS Submit credentials
+google-service-account.json

@@ -1,9 +1,10 @@
 import { Image } from 'expo-image';
 import { memo, useCallback, useMemo } from 'react';
-import { ActivityIndicator, FlatList, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { Button } from '../../../shared/ui/Button';
 import { colors } from '../../../shared/theme/colors';
+import { useFavoritePokemonQuery, useToggleFavoritePokemonMutation } from '../hooks/useFavoritePokemon';
 import { usePokemonListQuery } from '../hooks/usePokemon';
 import { getPokemonId, getPokemonImageUrl, PokemonSummary } from '../schema';
 
@@ -23,6 +24,11 @@ export function PokemonScreen() {
     isFetchingNextPage,
   } = usePokemonListQuery();
 
+  const { data: favorites } = useFavoritePokemonQuery();
+  const toggleFavorite = useToggleFavoritePokemonMutation();
+
+  const favoriteSet = useMemo(() => new Set(favorites), [favorites]);
+
   const pokemon = useMemo(() => data?.pages.flatMap((page) => page.results) ?? [], [data]);
 
   const loadMore = useCallback(() => {
@@ -31,9 +37,20 @@ export function PokemonScreen() {
     }
   }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
+  const onToggleFavorite = useCallback(
+    (url: string) => toggleFavorite.mutate(url),
+    [toggleFavorite],
+  );
+
   const renderItem = useCallback(
-    ({ item }: { item: PokemonSummary }) => <PokemonRow pokemon={item} />,
-    [],
+    ({ item }: { item: PokemonSummary }) => (
+      <PokemonRow
+        pokemon={item}
+        isFavorite={favoriteSet.has(item.url)}
+        onToggleFavorite={onToggleFavorite}
+      />
+    ),
+    [favoriteSet, onToggleFavorite],
   );
 
   const getItemLayout = useCallback(
@@ -78,7 +95,13 @@ function keyExtractor(item: PokemonSummary) {
   return item.url;
 }
 
-const PokemonRow = memo(function PokemonRow({ pokemon }: { pokemon: PokemonSummary }) {
+type PokemonRowProps = {
+  pokemon: PokemonSummary;
+  isFavorite: boolean;
+  onToggleFavorite: (url: string) => void;
+};
+
+const PokemonRow = memo(function PokemonRow({ pokemon, isFavorite, onToggleFavorite }: PokemonRowProps) {
   const id = getPokemonId(pokemon.url);
 
   return (
@@ -93,6 +116,16 @@ const PokemonRow = memo(function PokemonRow({ pokemon }: { pokemon: PokemonSumma
       <Text style={styles.name} numberOfLines={1}>
         {pokemon.name}
       </Text>
+      <Pressable
+        onPress={() => onToggleFavorite(pokemon.url)}
+        hitSlop={8}
+        accessibilityRole="button"
+        accessibilityLabel={isFavorite ? `Unfavorite ${pokemon.name}` : `Favorite ${pokemon.name}`}
+      >
+        <Text style={[styles.favorite, isFavorite && styles.favoriteActive]}>
+          {isFavorite ? '★' : '☆'}
+        </Text>
+      </Pressable>
     </View>
   );
 });
@@ -135,5 +168,13 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: colors.text,
     textTransform: 'capitalize',
+    flex: 1,
+  },
+  favorite: {
+    fontSize: 24,
+    color: colors.textMuted,
+  },
+  favoriteActive: {
+    color: colors.primary,
   },
 });

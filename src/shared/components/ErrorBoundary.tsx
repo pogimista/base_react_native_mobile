@@ -2,7 +2,9 @@ import { Component, ReactNode } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
 import { Button } from '../ui/Button';
-import { colors } from '../theme/colors';
+// Rendered outside ThemeProvider (see app/_layout.tsx) so it stays available
+// even if theme setup itself throws — sticks to the static light palette.
+import { lightColors as colors } from '../theme/colors';
 import { captureException } from '../../lib/sentry';
 
 type Props = {

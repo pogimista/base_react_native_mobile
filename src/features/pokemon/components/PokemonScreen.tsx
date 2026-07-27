@@ -3,7 +3,8 @@ import { memo, useCallback, useMemo } from 'react';
 import { ActivityIndicator, FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { Button } from '../../../shared/ui/Button';
-import { colors } from '../../../shared/theme/colors';
+import { Colors } from '../../../shared/theme/colors';
+import { useTheme } from '../../../shared/theme/ThemeContext';
 import { useFavoritePokemonQuery, useToggleFavoritePokemonMutation } from '../hooks/useFavoritePokemon';
 import { usePokemonListQuery } from '../hooks/usePokemon';
 import { getPokemonId, getPokemonImageUrl, PokemonSummary } from '../schema';
@@ -13,6 +14,9 @@ const ROW_SPACING = 12;
 const ITEM_HEIGHT = ROW_HEIGHT + ROW_SPACING;
 
 export function PokemonScreen() {
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
+
   const {
     data,
     isLoading,
@@ -107,6 +111,8 @@ type PokemonRowProps = {
 };
 
 const PokemonRow = memo(function PokemonRow({ pokemon, isFavorite, onToggleFavorite }: PokemonRowProps) {
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
   const id = getPokemonId(pokemon.url);
 
   return (
@@ -135,55 +141,57 @@ const PokemonRow = memo(function PokemonRow({ pokemon, isFavorite, onToggleFavor
   );
 });
 
-const styles = StyleSheet.create({
-  center: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 12,
-  },
-  content: {
-    padding: 20,
-    gap: 12,
-  },
-  footer: {
-    paddingVertical: 20,
-  },
-  row: {
-    height: ROW_HEIGHT,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-    backgroundColor: colors.surface,
-    borderRadius: 12,
-    padding: 12,
-    marginBottom: ROW_SPACING,
-  },
-  image: {
-    width: 48,
-    height: 48,
-  },
-  id: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: colors.textMuted,
-  },
-  name: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: colors.text,
-    textTransform: 'capitalize',
-    flex: 1,
-  },
-  favorite: {
-    fontSize: 24,
-    color: colors.textMuted,
-  },
-  favoriteActive: {
-    color: colors.primary,
-  },
-  emptyText: {
-    fontSize: 16,
-    color: colors.textMuted,
-  },
-});
+function createStyles(colors: Colors) {
+  return StyleSheet.create({
+    center: {
+      flex: 1,
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: 12,
+    },
+    content: {
+      padding: 20,
+      gap: 12,
+    },
+    footer: {
+      paddingVertical: 20,
+    },
+    row: {
+      height: ROW_HEIGHT,
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 12,
+      backgroundColor: colors.surface,
+      borderRadius: 12,
+      padding: 12,
+      marginBottom: ROW_SPACING,
+    },
+    image: {
+      width: 48,
+      height: 48,
+    },
+    id: {
+      fontSize: 14,
+      fontWeight: '600',
+      color: colors.textMuted,
+    },
+    name: {
+      fontSize: 16,
+      fontWeight: '600',
+      color: colors.text,
+      textTransform: 'capitalize',
+      flex: 1,
+    },
+    favorite: {
+      fontSize: 24,
+      color: colors.textMuted,
+    },
+    favoriteActive: {
+      color: colors.primary,
+    },
+    emptyText: {
+      fontSize: 16,
+      color: colors.textMuted,
+    },
+  });
+}

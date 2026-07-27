@@ -1,6 +1,8 @@
+import { useMemo } from 'react';
 import { ActivityIndicator, Pressable, StyleSheet, Text } from 'react-native';
 
-import { colors } from '../theme/colors';
+import { Colors } from '../theme/colors';
+import { useTheme } from '../theme/ThemeContext';
 
 type ButtonProps = {
   title: string;
@@ -10,6 +12,9 @@ type ButtonProps = {
 };
 
 export function Button({ title, onPress, loading, disabled }: ButtonProps) {
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
+
   return (
     <Pressable
       onPress={onPress}
@@ -29,24 +34,26 @@ export function Button({ title, onPress, loading, disabled }: ButtonProps) {
   );
 }
 
-const styles = StyleSheet.create({
-  button: {
-    backgroundColor: colors.primary,
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    borderRadius: 8,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  buttonPressed: {
-    opacity: 0.85,
-  },
-  buttonDisabled: {
-    opacity: 0.5,
-  },
-  text: {
-    color: colors.primaryText,
-    fontWeight: '600',
-    fontSize: 16,
-  },
-});
+function createStyles(colors: Colors) {
+  return StyleSheet.create({
+    button: {
+      backgroundColor: colors.primary,
+      paddingVertical: 12,
+      paddingHorizontal: 16,
+      borderRadius: 8,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    buttonPressed: {
+      opacity: 0.85,
+    },
+    buttonDisabled: {
+      opacity: 0.5,
+    },
+    text: {
+      color: colors.primaryText,
+      fontWeight: '600',
+      fontSize: 16,
+    },
+  });
+}

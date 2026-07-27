@@ -1,10 +1,12 @@
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useMemo } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { ActivityIndicator, FlatList, StyleSheet, Text, View } from 'react-native';
 
 import { Button } from '../../../shared/ui/Button';
 import { TextField } from '../../../shared/ui/TextField';
-import { colors } from '../../../shared/theme/colors';
+import { Colors } from '../../../shared/theme/colors';
+import { useTheme } from '../../../shared/theme/ThemeContext';
 import {
   useCreatePostMutation,
   useDeletePostMutation,
@@ -14,6 +16,9 @@ import {
 import { createPostSchema, CreatePostInput, Post } from '../schema';
 
 export function PostsScreen() {
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
+
   const { data: posts, isLoading, isError, refetch, isRefetching } = usePostsQuery();
   const createPost = useCreatePostMutation();
   const renamePost = useRenamePostMutation();
@@ -105,6 +110,9 @@ type PostRowProps = {
 };
 
 function PostRow({ post, onRename, onDelete, renaming, deleting }: PostRowProps) {
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
+
   return (
     <View style={styles.row}>
       <View style={styles.rowText}>
@@ -121,47 +129,49 @@ function PostRow({ post, onRename, onDelete, renaming, deleting }: PostRowProps)
   );
 }
 
-const styles = StyleSheet.create({
-  center: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 12,
-  },
-  content: {
-    padding: 20,
-    gap: 12,
-  },
-  form: {
-    gap: 12,
-    marginBottom: 12,
-  },
-  heading: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: colors.textMuted,
-  },
-  row: {
-    backgroundColor: colors.surface,
-    borderRadius: 12,
-    padding: 16,
-    gap: 12,
-    marginBottom: 12,
-  },
-  rowText: {
-    gap: 4,
-  },
-  title: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: colors.text,
-  },
-  body: {
-    fontSize: 14,
-    color: colors.textMuted,
-  },
-  rowActions: {
-    flexDirection: 'row',
-    gap: 12,
-  },
-});
+function createStyles(colors: Colors) {
+  return StyleSheet.create({
+    center: {
+      flex: 1,
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: 12,
+    },
+    content: {
+      padding: 20,
+      gap: 12,
+    },
+    form: {
+      gap: 12,
+      marginBottom: 12,
+    },
+    heading: {
+      fontSize: 14,
+      fontWeight: '600',
+      color: colors.textMuted,
+    },
+    row: {
+      backgroundColor: colors.surface,
+      borderRadius: 12,
+      padding: 16,
+      gap: 12,
+      marginBottom: 12,
+    },
+    rowText: {
+      gap: 4,
+    },
+    title: {
+      fontSize: 16,
+      fontWeight: '600',
+      color: colors.text,
+    },
+    body: {
+      fontSize: 14,
+      color: colors.textMuted,
+    },
+    rowActions: {
+      flexDirection: 'row',
+      gap: 12,
+    },
+  });
+}

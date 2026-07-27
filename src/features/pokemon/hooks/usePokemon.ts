@@ -9,5 +9,8 @@ export function usePokemonListQuery() {
     queryFn: ({ pageParam }) => fetchPokemonList(pageParam),
     initialPageParam: 0,
     getNextPageParam: (lastPage) => getNextOffset(lastPage.next),
+    // Loaded only via pull-to-refresh (see PokemonScreen), not automatically on mount,
+    // so a previously persisted cache is shown as-is until the user asks for fresh data.
+    enabled: false,
   });
 }

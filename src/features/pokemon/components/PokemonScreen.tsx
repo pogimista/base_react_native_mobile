@@ -66,7 +66,7 @@ export function PokemonScreen() {
     return <ActivityIndicator style={styles.center} />;
   }
 
-  if (isError) {
+  if (isError && pokemon.length === 0) {
     return (
       <View style={styles.center}>
         <Text>Failed to load pokemon.</Text>
@@ -86,6 +86,11 @@ export function PokemonScreen() {
       onEndReached={loadMore}
       renderItem={renderItem}
       getItemLayout={getItemLayout}
+      ListEmptyComponent={
+        <View style={styles.center}>
+          <Text style={styles.emptyText}>Pull down to load Pokémon</Text>
+        </View>
+      }
       ListFooterComponent={isFetchingNextPage ? <ActivityIndicator style={styles.footer} /> : null}
     />
   );
@@ -176,5 +181,9 @@ const styles = StyleSheet.create({
   },
   favoriteActive: {
     color: colors.primary,
+  },
+  emptyText: {
+    fontSize: 16,
+    color: colors.textMuted,
   },
 });

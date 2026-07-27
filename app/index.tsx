@@ -2,6 +2,7 @@ import { Link } from 'expo-router';
 import { useMemo } from 'react';
 import { ScrollView, StyleSheet, Text } from 'react-native';
 
+import { AuthCard } from '../src/features/auth/AuthCard';
 import { CounterCard } from '../src/features/counter/CounterCard';
 import { ProfileForm } from '../src/features/profile/ProfileForm';
 import { Button } from '../src/shared/ui/Button';
@@ -29,6 +30,7 @@ export default function HomeScreen() {
       <Link href="/pokemon" style={styles.link}>
         Go to Pokemon (API GET demo) →
       </Link>
+      <AuthCard />
       <CounterCard />
       <ProfileForm />
     </ScrollView>
